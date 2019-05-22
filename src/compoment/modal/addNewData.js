@@ -10,7 +10,7 @@ const formItemLayout = {
 const ModifyCreateForm = Form.create({ name: 'form_in_modal' })(
   class extends React.Component {
     render() {
-      const { visible, onCancel, onCreate, form, pageName } = this.props;
+      const { visible, onCancel, onCreate, form, } = this.props;
       const { getFieldDecorator } = form;
       return (
         <Modal
@@ -26,24 +26,24 @@ const ModifyCreateForm = Form.create({ name: 'form_in_modal' })(
               <Row>
                 <Col span={18} offset={4}>
                   <Form.Item {...formItemLayout} label="代码">
-                    {getFieldDecorator('title', {
+                    {getFieldDecorator('code', {
                       rules: [{ message: '请输入用户名' }],
                     })(<Input />)}
                   </Form.Item>
                 </Col>
                 <Col span={18} offset={4}>
                   <Form.Item {...formItemLayout} label="名称">
-                    {getFieldDecorator('description')(<Input type="input" readOnly="readOnly"/>)}
+                    {getFieldDecorator('name')(<Input type="input" readOnly="readOnly"/>)}
                   </Form.Item>
                 </Col>
                 <Col span={18} offset={4}>
                   <Form.Item {...formItemLayout} label="类型">
-                    {getFieldDecorator('description')(<Input type="input" readOnly="readOnly"/>)}
+                    {getFieldDecorator('type')(<Input type="input"/>)}
                   </Form.Item>
                 </Col>
                 <Col span={18} offset={4}>
                 <Form.Item {...formItemLayout} label="备注">
-                    {getFieldDecorator('description')(<Input type="textarea" />)}
+                    {getFieldDecorator('description')(<Input type="textarea"/>)}
                   </Form.Item>
                 </Col>
             
@@ -61,24 +61,26 @@ class CollectionsPage extends React.Component {
       super(props)
       
       this.state = {
-        a: false
+        receivedValues: {}
       }
-  
+      
     }
 
   handleCancel = () => {
     this.props.cancelModal()
   };
 
-  handleCreate = () => {
+  handleCreate = (event) => {
     const form = this.formRef.props.form;
     form.validateFields((err, values) => {
       if (err) {
         return;
       }
-      console.log('Received values of form: ', values);
+      console.log(values);
+      event = values
       form.resetFields();
       this.props.cancelModal()
+      this.props.onUpdata(event);
     });
   };
 
@@ -94,7 +96,7 @@ class CollectionsPage extends React.Component {
           wrappedComponentRef={this.saveFormRef}
           visible={this.props.visible}
           onCancel={this.handleCancel}
-          onCreate={this.handleCreate}
+          onCreate={(event)=>{this.handleCreate(event)}}
         />
       </div>
     );

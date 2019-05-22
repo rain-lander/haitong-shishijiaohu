@@ -18,3 +18,12 @@
     width: 100px;
     margin: 0px auto;
   }
+  .ant-page-header {
+    /* padding-left: 0; */
+    background-color: #e6f7ff;
+  }
+  .ant-row {
+    padding-top: 15px;
+  }
+
+  

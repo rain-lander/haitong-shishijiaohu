@@ -3,7 +3,7 @@ import './baseIndex.css'
 import AdvancedSearchForm from '../searchForm/searchForm'
 
 import AddUserinfo from '../modal/addUserinfo'
-import { PageHeader, Button } from 'antd';
+import { PageHeader, Button, Icon } from 'antd';
 // import { Row, Col } from 'antd';
 import { Table } from 'antd';
 
@@ -28,8 +28,12 @@ const columns = [
     title: '操作',
     key: 'operation',
     fixed: 'right',
-    width: 100,
-    render: () => <a href="javascript:;">action</a>,
+    width: 130,
+    render: () => <div>
+      <a href="javascript:;" style={{marginRight: "20px"}}><Icon type="edit" theme="twoTone" /></a>
+      <a href="javascript:;"><Icon type="delete" theme="twoTone" /></a>
+
+    </div>,
   },
 ];
 
@@ -121,10 +125,10 @@ class MyChat extends React.Component {
           <Button type="primary" onClick={this.showModal}>
             添加
           </Button>
-          <AddUserinfo pageName={this.state.pageName} visible={this.state.visible} cancelModal={this.handleCancel}></AddUserinfo>
+          <AddUserinfo visible={this.state.visible} cancelModal={this.handleCancel}></AddUserinfo>
         </div>
         <div>
-          <Table pageName={this.state.pageName} columns={columns} dataSource={data} scroll={{ x: 1500, y: 300  }} />
+          <Table columns={columns} dataSource={data} scroll={{ x: 1500, y: 300  }} />
         </div>
       </div>
       

@@ -50,6 +50,7 @@
     "react-emoji": "^0.5.0",
     "react-emoji-picker": "^1.0.13",
     "react-emojione": "^5.0.1",
+    "react-resizable": "^1.8.0",
     "react-router-dom": "^5.0.0",
     "resolve": "1.10.0",
     "sass-loader": "7.1.0",
