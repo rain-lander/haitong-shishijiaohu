@@ -1,6 +1,6 @@
 import React from 'react';
 import 'antd/dist/antd.css';
-import { Modal, Form, Input } from 'antd';
+import { Modal, Form, Input, message } from 'antd';
 import { Row, Col, Select,Button, Upload, Icon } from 'antd';
 const { Option } = Select;
 const formItemLayout = {
@@ -9,8 +9,38 @@ const formItemLayout = {
 };
 const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
   class extends React.Component {
+    constructor(props){
+      super(props)
+      this.state = {
+        selectDepart: [],
+        file: []
+      }
+    }    
+    normFile = e => {
+      this.props.onFile(e.fileList)
+      if (Array.isArray(e)) {
+        return e;
+      }
+      return e && e.fileList;
+    };
+
+    fetchDepartment(){
+      fetch('/user/getDepartment ')
+      .then( res => res.json() )
+      .then( res => {
+        if(res.code === 200){
+         this.setState({
+           selectDepart: res.data
+         })
+        }
+      })
+    }
+
+    componentDidMount(){
+      this.fetchDepartment()
+    }
+
     render() {
-      console.log(this.props)
       const { visible, onCancel, onCreate, form } = this.props;
       const { getFieldDecorator } = form;
       return (
@@ -27,40 +57,50 @@ const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
               <Row>
                 <Col span={18} offset={4}>
                   <Form.Item {...formItemLayout} label="用户名">
-                    {getFieldDecorator('title', {
-                      rules: [{ message: '请输入用户名' }],
+                    {getFieldDecorator('userName', {
+                      rules: [{required:true, message: '请输入用户名' }],
                     })(<Input />)}
                   </Form.Item>
                 </Col>
                 <Col span={18} offset={4}>
-                  <Form.Item {...formItemLayout} label="在线时间">
-                    {getFieldDecorator('description')(<Input type="input" readOnly="readOnly"/>)}
+                  <Form.Item {...formItemLayout} label="在线状态">
+                    {getFieldDecorator('status', {
+                      rules: [{required:true, message: '请输入在线状态' }],
+                    })(
+                      <Select placeholder="请选择在线状态">
+                        <Option value="1">是</Option>
+                        <Option value="0">否</Option>
+                      </Select>,
+                    )}
                   </Form.Item>
                 </Col>
                 <Col span={18} offset={4}>
                   <Form.Item {...formItemLayout} label="个性签名">
-                    {getFieldDecorator('description')(<Input type="textarea" />)}
+                    {getFieldDecorator('sign', {
+                      rules: [{required:true, message: '请输入个性签名' }],
+                    })(<Input type="textarea" />)}
                   </Form.Item>
                 </Col>
                 <Col span={18} offset={4}>
                   <Form.Item {...formItemLayout} label="所属部门" hasFeedback>
-                    {getFieldDecorator('select', {
-                      rules: [{ message: '请选择所属部门' }],
-                    })(
-                      <Select placeholder="请选择所属部门y">
-                        <Option value="china">China</Option>
-                        <Option value="usa">U.S.A</Option>
+                    {getFieldDecorator('code')(
+                      <Select placeholder="请选择所属部门">
+                        {this.state.selectDepart.map((item, index) => {
+                          return (
+                            <Option key={item.id} value={item.code}>{item.name}</Option>
+                          )
+                        })}
                       </Select>,
                     )}
                   </Form.Item>
                 </Col>
                 <Col span={18} offset={4}>
                   <Form.Item {...formItemLayout} label="头像" extra="long">
-                    {getFieldDecorator('upload', {
+                    {getFieldDecorator('file', {
                       valuePropName: 'fileList',
                       getValueFromEvent: this.normFile,
                     })(
-                      <Upload name="logo" action="/upload.do" listType="picture">
+                      <Upload name="file" action="/user/import" listType="picture">
                         <Button>
                           <Icon type="upload" />上传头像
                         </Button>
@@ -79,16 +119,29 @@ const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
 class CollectionsPage extends React.Component {
     constructor(props){
       super(props)
-      
       this.state = {
-        a: false
+        fileList: [],
+        file: ''
       }
-  
+      this.onFile = this.onFile.bind(this)
     }
 
   handleCancel = () => {
     this.props.cancelModal()
   };
+
+  onFile(e){
+    let result = e[0]
+    if(result.status === "done"){
+      let fileRes = result.response
+      if(fileRes.code === 200){
+        console.log(fileRes)
+        this.setState({
+          file: fileRes.data
+        })
+      }
+    }
+  }
 
   handleCreate = () => {
     const form = this.formRef.props.form;
@@ -99,6 +152,38 @@ class CollectionsPage extends React.Component {
       console.log('Received values of form: ', values);
       form.resetFields();
       this.props.cancelModal()
+      this.props.onUpdata(values);
+      console.log(values.file[0].response.data)
+      //判断是否上传完成
+      if(values.file[0].status === "done"){
+        // 新增用户
+        let userInfo = {
+          userName: values.userName,
+          code: values.code,
+          sign: values.sign,
+          status: values.status,
+          avatar: values.file[0].response.data
+        }
+        fetch('/user/save',{
+          method: 'POST',
+          headers:{
+            'Content-Type':'application/json'
+          },
+          body: JSON.stringify(userInfo)
+        })
+        .then( res => res.json())
+        .then( res => {
+          console.log(res)
+          if(res.code === 200){
+            message.success(res.msg)
+          }else {
+            message.warning(res.msg);
+          }
+        })
+        .catch( res => {
+          console.log(res)
+        })
+      }
     });
   };
 
@@ -115,6 +200,7 @@ class CollectionsPage extends React.Component {
           visible={this.props.visible}
           onCancel={this.handleCancel}
           onCreate={this.handleCreate}
+          onFile={this.onFile}
         />
       </div>
     );

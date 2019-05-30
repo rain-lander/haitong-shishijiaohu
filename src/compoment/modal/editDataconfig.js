@@ -7,7 +7,7 @@ const formItemLayout = {
   labelCol: { span: 4 },
   wrapperCol: { span: 16 },
 };
-const ModifyCreateForm = Form.create({ name: 'form_in_modal' })(
+const ModifySafeForm = Form.create({ name: 'form_in_modal' })(
   class extends React.Component {
     render() {
       const { visible, onCancel, onCreate, form, } = this.props;
@@ -15,7 +15,7 @@ const ModifyCreateForm = Form.create({ name: 'form_in_modal' })(
       return (
         <Modal
           visible={visible}
-          title="新增用户信息"
+          title="修改用户信息"
           okText="保存"
           cancelText="取消"
           onCancel={onCancel}
@@ -24,6 +24,13 @@ const ModifyCreateForm = Form.create({ name: 'form_in_modal' })(
           <Form layout="vertical">
             {/* 配置信息维护 */}
               <Row>
+                <Col span={18} offset={4}>
+                  <Form.Item {...formItemLayout} label="ID">
+                    {getFieldDecorator('id', {
+                      rules: [{ message: '请输入用户ID' }],
+                    })(<Input />)}
+                  </Form.Item>
+                </Col>  
                 <Col span={18} offset={4}>
                   <Form.Item {...formItemLayout} label="代码">
                     {getFieldDecorator('code', {
@@ -56,7 +63,7 @@ const ModifyCreateForm = Form.create({ name: 'form_in_modal' })(
   },
 );
 
-class CollectionsPage extends React.Component {
+class editPage extends React.Component {
     constructor(props){
       super(props)
       
@@ -77,7 +84,7 @@ class CollectionsPage extends React.Component {
         return;
       }
       console.log(values);
-      values['key']=9
+      values['key'] = 9
       event = values
       form.resetFields();
       this.props.cancelModal()
@@ -93,7 +100,7 @@ class CollectionsPage extends React.Component {
     // console.log(this.props)
     return (
       <div>
-        <ModifyCreateForm
+        <ModifySafeForm
           wrappedComponentRef={this.saveFormRef}
           visible={this.props.visible}
           onCancel={this.handleCancel}
@@ -104,5 +111,5 @@ class CollectionsPage extends React.Component {
   }
 }
 
-export default CollectionsPage
+export default editPage
           

@@ -1,5 +1,4 @@
 import React from 'react'
-// import Emojify from 'react-emojione';
 import { Icon } from 'antd';
 import EmojiPicker from 'emoji-picker-react';
 
@@ -14,7 +13,8 @@ class TypeIn extends React.Component {
     super(props);
     this.state = {
       text: "",
-      emojiShow: false
+      emojiShow: false,
+      
     };
     this.messageSend = this.messageSend.bind(this);
     this.messageType = this.messageType.bind(this);
@@ -24,6 +24,9 @@ class TypeIn extends React.Component {
 
     this.changeEmojiShow = this.changeEmojiShow.bind(this)
     this.emojiEdit = this.emojiEdit.bind(this)
+    this.hideEmoji = this.hideEmoji.bind(this)
+
+    this.changeUploadShow = this.changeUploadShow.bind(this)
 
   }
   messageType(e) {
@@ -36,6 +39,7 @@ class TypeIn extends React.Component {
       text: ''
     });
     let value = this.refs.myInput.value;
+    // console.log(value)
     this.props.messageReceive({value})
     this.setState({
       emojiShow: false
@@ -81,19 +85,38 @@ class TypeIn extends React.Component {
       text: this.state.text+emoji_icon
     })
   }
+
+  hideEmoji(){
+    this.setState({
+      emojiShow: false
+    })
+  }
+
+  changeUploadShow(){
+    this.setState({
+      uploadShow: !this.state.emojiShow
+    })
+  }
   
   render() {
     return (
       <div className="text-box">
-        <div className="emoji_btn" onClick={this.changeEmojiShow}>
-          <Icon type="smile" theme="outlined" />
+        <div className="emoji_btn">
+          <span className="emoji_icon" onClick={this.changeEmojiShow}>
+            <Icon type="smile" theme="twoTone" />
+          </span>
+          <span className="file_icon" onClick={this.changeUploadShow}>
+            <Icon type="folder" theme="twoTone" />
+          </span>
         </div>
+        {/* 是否展示emoji盒子 */}
         {
           !this.state.emojiShow ? (null) : (
               <EmojiPicker onEmojiClick={this.emojiEdit}/>
           )
         }
-        <div className='type-in'>
+        
+        <div className='type-in'  onClick={this.hideEmoji}>
           <textarea ref="myInput" onKeyUp={this.handleUp} onChange={this.messageType} onKeyDown={this.handleDown} value={this.state.text} onKeyPress={this.handlePress}>
           </textarea>
           <button onClick={this.messageSend} ref="myButton">

@@ -19,7 +19,7 @@
   list-style-type: none;
 }
 
-.msg-show span {
+.msg-show .user_name {
   display: inline-block;
   margin-top: 3px;
   color: #6f5499;
@@ -30,4 +30,15 @@
   height: 400px;
   overflow: auto;
 }
-  
+.ant-card-meta-title {
+  margin: 10px 0;
+} 
+.message_file {
+  display: flex;
+  justify-content: space-between;
+
+}
+.message_flex {
+  line-height: 45px;
+  /* justify-content: space-between; */
+}

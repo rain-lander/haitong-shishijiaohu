@@ -25,5 +25,25 @@
   .ant-row {
     padding-top: 15px;
   }
+  .msg-show {
+    position: relative;
+  }
+  .ant-upload.ant-upload-select {
+    position: absolute;
+    bottom: 0px;
+    left: 32px;
+    z-index: 2;
+    /* opacity: 0; */
+  }
 
+
+  .message_upload {
+    /* position: relative; */
+    height: 66px;
+    padding: 8px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    width: 260px;
+    background-color: #fff;
+  }
   

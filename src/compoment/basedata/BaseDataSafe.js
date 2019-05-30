@@ -3,11 +3,11 @@ import './baseIndex.css'
 import AdvancedSearchForm from '../searchForm/searchForm'
 
 import AddNewData from '../modal/addNewData'
+import EditDatasafe from '../modal/editDatasafe'
+
 import { PageHeader, Button, Icon, Popconfirm } from 'antd';
 // import { Row, Col } from 'antd';
 import { Table } from 'antd';
-
-// const Search = Input.Search;
 
 class DataSafeguard extends React.Component {
   constructor(props){
@@ -15,8 +15,8 @@ class DataSafeguard extends React.Component {
     this.state = {
       inputValue: '',
       visible: false,
+      editVisible: false,
       pageName: 'BaseDataSafe',
-
       columns: [
       {
         title: '用户名称',
@@ -40,18 +40,18 @@ class DataSafeguard extends React.Component {
         fixed: 'right',
         width: 130,
         render: (text, record) =>  <div>
-                        <a href="javascript:;" style={{marginRight: "20px"}}><Icon type="edit" theme="twoTone" /></a>
+                        <span onClick={()=>this.showEditModal(record.key)} style={{marginRight: "20px"}}><Icon type="edit" theme="twoTone" /></span>
                         {/* <a href="javascript:;"><Icon type="delete" theme="twoTone" /></a> */}
                         {/* this.state.dataSource.length >= 1 ? ( */}
-                <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDelete(record.key)}>
-                  <a href="javascript:;">{record.key}<Icon type="delete" theme="twoTone"/></a>
+                <Popconfirm cancelText="取消" okText="确认" title="确认删除?" onConfirm={() => this.handleDelete(record.key)}>
+                  <span><Icon type="delete" theme="twoTone"/></span>
                 </Popconfirm>
               {/* ) : null, */}
                       </div>,
       },
     ],
 
-    data: [
+      data: [
       {
         key: '1',
         name: 'John Brown',
@@ -100,15 +100,9 @@ class DataSafeguard extends React.Component {
         age: 40,
         address: 'London Park',
       },
-  
-      
     ]
-  
-
     };
-
-
-
+    this.addUserinfo = this.addUserinfo.bind(this)
   }
 
   handleDelete = key => {
@@ -116,21 +110,47 @@ class DataSafeguard extends React.Component {
     console.log(key)
     // this.setState({ dataSource: dataSource.filter(item => item.key !== key) });
   };
-  //控制modal框隐藏和显示
+  //控制新增数据modal框隐藏和显示
   showModal = () => {
     this.setState({ visible: true });
+  };
+
+  //控制编辑数据modal框隐藏和显示
+  showEditModal = (i) => {
+    console.log(i)
+    this.setState({ editVisible: true });
   };
 
   handleCancel =() => {
     this.setState({ visible: false });
   }
+
+  edithandleCancel=() => {
+    this.setState({ editVisible: false });
+  }
+
   handleCreate =() => {
     this.setState({ visible: false });
   }
-
-  editRow(i){
-    console.log(i)
+  addUserinfo(e){
+    console.log(e)
+    // console.log(this.state.data)
+    let newData = this.state.data.push(e)
+    console.log(newData)
+    // this.setState({
+    //   // data: newData
+    // }, ()=> {
+    //   console.log(newData)
+    // })
   }
+  editDataSafe(e){
+    console.log(e)
+  }
+
+  edithandleCancel =() => {
+    this.setState({ editVisible: false });
+  }
+
   render() {
     return (
       <div>
@@ -142,7 +162,8 @@ class DataSafeguard extends React.Component {
           <Button type="primary" onClick={this.showModal}>
             添加
           </Button>
-          <AddNewData visible={this.state.visible} cancelModal={this.handleCancel}></AddNewData>
+          <AddNewData onUpdata={this.addUserinfo} visible={this.state.visible} cancelModal={this.handleCancel}></AddNewData>
+          <EditDatasafe onUpdata={this.editDataSafe} visible={this.state.editVisible} cancelModal={this.edithandleCancel}></EditDatasafe>
         </div>
         <div>
           <Table pageName={this.state.pageName} columns={this.state.columns} dataSource={this.state.data} scroll={{ x: 1500, y: 300  }} />

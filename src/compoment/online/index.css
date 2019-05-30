@@ -43,3 +43,12 @@
   display: flex;
   flex: 1;
 }
+
+.upload_input {
+  z-index: 2;
+  width: 30px;
+  position: absolute;
+  left: 40px;
+  bottom: 130px;
+  opacity: 0;
+}
