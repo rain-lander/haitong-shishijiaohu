@@ -149,7 +149,7 @@ class CollectionsPage extends React.Component {
       if (err) {
         return;
       }
-      console.log('Received values of form: ', values);
+      console.log('Received', values);
       form.resetFields();
       this.props.cancelModal()
       this.props.onUpdata(values);
