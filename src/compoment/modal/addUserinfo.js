@@ -4,8 +4,8 @@ import { Modal, Form, Input, message } from 'antd';
 import { Row, Col, Select,Button, Upload, Icon } from 'antd';
 const { Option } = Select;
 const formItemLayout = {
-  labelCol: { span: 4 },
-  wrapperCol: { span: 16 },
+  labelCol: { span: 6 },
+  wrapperCol: { span: 14 },
 };
 const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
   class extends React.Component {
@@ -13,7 +13,8 @@ const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
       super(props)
       this.state = {
         selectDepart: [],
-        file: []
+        file: [],
+        fileList: []
       }
     }    
     normFile = e => {
@@ -25,7 +26,7 @@ const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
     };
 
     fetchDepartment(){
-      fetch('/user/getDepartment ')
+      fetch('/user/getDepartment')
       .then( res => res.json() )
       .then( res => {
         if(res.code === 200){
@@ -34,15 +35,30 @@ const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
          })
         }
       })
+      .catch( res => {
+        console.log(res)
+      })
     }
 
     componentDidMount(){
       this.fetchDepartment()
     }
 
+    // componentWillReceiveProps(o){
+    //   console.log(o)
+    //   if(o.showUpload===true){
+    //     this.setState({
+    //       fileList: []
+    //     })
+    //   }
+    // }
+    handleChange = ({ fileList }) => this.setState({ fileList });
+
     render() {
-      const { visible, onCancel, onCreate, form } = this.props;
+      const { visible, onCancel, onCreate, form, showUpload } = this.props;
+      const { fileList } = this.state;
       const { getFieldDecorator } = form;
+      // console.log(showUpload)
       return (
         <Modal
           visible={visible}
@@ -83,7 +99,7 @@ const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
                 </Col>
                 <Col span={18} offset={4}>
                   <Form.Item {...formItemLayout} label="所属部门" hasFeedback>
-                    {getFieldDecorator('code')(
+                    {getFieldDecorator('groupCode')(
                       <Select placeholder="请选择所属部门">
                         {this.state.selectDepart.map((item, index) => {
                           return (
@@ -95,15 +111,18 @@ const CollectionCreateForm = Form.create({ name: 'form_in_modal' })(
                   </Form.Item>
                 </Col>
                 <Col span={18} offset={4}>
-                  <Form.Item {...formItemLayout} label="头像" extra="long">
+                  <Form.Item {...formItemLayout} label="头像">
                     {getFieldDecorator('file', {
+                      rules: [{required:true, message: '请上传头像' }],
                       valuePropName: 'fileList',
                       getValueFromEvent: this.normFile,
                     })(
-                      <Upload name="file" action="/user/import" listType="picture">
-                        <Button>
-                          <Icon type="upload" />上传头像
-                        </Button>
+                      <Upload name="file" onChange={this.handleChange} setFieldsValue={fileList} action="/user/import" listType="picture">
+                        {this.state.fileList.length > 0 && showUpload!=='1'? (null):(
+                          <Button>
+                            <Icon type="upload" />上传图片
+                          </Button>
+                        )}
                       </Upload>,
                     )}
                   </Form.Item>
@@ -121,7 +140,8 @@ class CollectionsPage extends React.Component {
       super(props)
       this.state = {
         fileList: [],
-        file: ''
+        file: '',
+        showUpload: '0'
       }
       this.onFile = this.onFile.bind(this)
     }
@@ -132,19 +152,29 @@ class CollectionsPage extends React.Component {
 
   onFile(e){
     let result = e[0]
+    this.setState({
+      showUpload: '0'
+    })
     if(result.status === "done"){
       let fileRes = result.response
       if(fileRes.code === 200){
-        console.log(fileRes)
+        message.success('头像上传成功～')
         this.setState({
-          file: fileRes.data
+          file: fileRes.data,
+
         })
+        console.log(fileRes)
+       
       }
     }
   }
 
   handleCreate = () => {
     const form = this.formRef.props.form;
+    this.setState({
+      showUpload: '1'
+    })
+    console.log(this.state)
     form.validateFields((err, values) => {
       if (err) {
         return;
@@ -152,17 +182,14 @@ class CollectionsPage extends React.Component {
       console.log('Received', values);
       form.resetFields();
       this.props.cancelModal()
-      this.props.onUpdata(values);
-      console.log(values.file[0].response.data)
-      //判断是否上传完成
-      if(values.file[0].status === "done"){
+      
         // 新增用户
         let userInfo = {
           userName: values.userName,
-          code: values.code,
+          groupCode: values.groupCode,
           sign: values.sign,
           status: values.status,
-          avatar: values.file[0].response.data
+          avatar: this.state.file
         }
         fetch('/user/save',{
           method: 'POST',
@@ -174,8 +201,11 @@ class CollectionsPage extends React.Component {
         .then( res => res.json())
         .then( res => {
           console.log(res)
+          
           if(res.code === 200){
             message.success(res.msg)
+            this.props.onUpdata(values);
+
           }else {
             message.warning(res.msg);
           }
@@ -183,7 +213,7 @@ class CollectionsPage extends React.Component {
         .catch( res => {
           console.log(res)
         })
-      }
+      // }
     });
   };
 
@@ -192,7 +222,6 @@ class CollectionsPage extends React.Component {
   };
 
   render() {
-    // console.log(this.props)
     return (
       <div>
         <CollectionCreateForm
@@ -201,6 +230,7 @@ class CollectionsPage extends React.Component {
           onCancel={this.handleCancel}
           onCreate={this.handleCreate}
           onFile={this.onFile}
+          showUpload={this.state.showUpload}
         />
       </div>
     );

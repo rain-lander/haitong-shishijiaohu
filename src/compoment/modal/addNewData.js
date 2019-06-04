@@ -1,7 +1,7 @@
 import React from 'react';
 import 'antd/dist/antd.css';
 import { Modal, Form, Input } from 'antd';
-import { Row, Col } from 'antd';
+import { Row, Col, message } from 'antd';
 // const { Option } = Select;
 const formItemLayout = {
   labelCol: { span: 4 },
@@ -27,18 +27,22 @@ const ModifyCreateForm = Form.create({ name: 'form_in_modal' })(
                 <Col span={18} offset={4}>
                   <Form.Item {...formItemLayout} label="代码">
                     {getFieldDecorator('code', {
-                      rules: [{ message: '请输入用户名' }],
+                      rules: [{required:true, message: '请输入代码' }],
                     })(<Input />)}
                   </Form.Item>
                 </Col>
                 <Col span={18} offset={4}>
                   <Form.Item {...formItemLayout} label="名称">
-                    {getFieldDecorator('name')(<Input type="input"/>)}
+                    {getFieldDecorator('name',{
+                      rules: [{required:true, message: '请输入名称' }],
+                    })(<Input type="input"/>)}
                   </Form.Item>
                 </Col>
                 <Col span={18} offset={4}>
                   <Form.Item {...formItemLayout} label="类型">
-                    {getFieldDecorator('type')(<Input type="input"/>)}
+                    {getFieldDecorator('type', {
+                      rules: [{required:true, message: '请输入类型' }],
+                    })(<Input type="input"/>)}
                   </Form.Item>
                 </Col>
                 <Col span={18} offset={4}>
@@ -77,11 +81,40 @@ class CollectionsPage extends React.Component {
         return;
       }
       console.log(values);
-      values['key']=9
       event = values
       form.resetFields();
+      // code: "002"
+      // description: "jajajaja"
+      // name: "opqa"
+      // type: "001"
+      let dataInfo = {
+        name: values.name,
+        code: values.code,
+        type: values.type,
+        remark: values.description,
+      }
+      fetch('/dic/save',{
+        method: 'POST',
+        headers:{
+          'Content-Type':'application/json'
+        },
+        body: JSON.stringify(dataInfo)
+      })
+      .then( res => res.json())
+      .then( res => {
+        console.log(res)
+        if(res.code === 200){
+          message.success(res.msg)
+          this.props.onUpdata(values);
+        }else {
+          message.warning(res.msg);
+        }
+      })
+      .catch( res => {
+        console.log(res)
+      })
+
       this.props.cancelModal()
-      this.props.onUpdata(event);
     });
   };
 

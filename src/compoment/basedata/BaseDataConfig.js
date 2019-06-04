@@ -16,6 +16,7 @@ class DataSafeguard extends React.Component {
       inputValue: '',
       visible: false,
       editVisible: false,
+      uploadBtn: 0,
       pageName: 'BaseDataConfig',
       columns: [
       {
@@ -46,6 +47,12 @@ class DataSafeguard extends React.Component {
         key: 'status',
       },
       {
+        title: '部门',
+        width: 200,
+        dataIndex: 'groupCode',
+        key: 'groupCode',
+      },
+      {
         
       },
      
@@ -55,55 +62,84 @@ class DataSafeguard extends React.Component {
         fixed: 'right',
         width: 150,
         render: (text, record) =>  <div>
-                        <span onClick={()=>this.showEditModal(record.key)} style={{marginRight: "20px"}}><Icon type="edit" theme="twoTone" /></span>
+                        <span onClick={()=>this.showEditModal(record, record.key)} style={{marginRight: "20px"}}><Icon type="edit" theme="twoTone" /></span>
                         {/* <a href="javascript:;"><Icon type="delete" theme="twoTone" /></a> */}
                         {/* this.state.dataSource.length >= 1 ? ( */}
-                <Popconfirm cancelText="取消" okText="确认" title="确认删除?" onConfirm={() => this.handleDelete(record.key)}>
+                <Popconfirm cancelText="取消" okText="确认" title="确认删除?" onConfirm={() => this.handleDelete(record.key, record.id)}>
                   <span><Icon type="delete" theme="twoTone"/></span>
                 </Popconfirm>
               {/* ) : null, */}
                       </div>,
       },
     ],
+    data: [],
 
-      data: []
+      // data: [{
+			// 	"id": 41,
+			// 	"userName": "EE",
+			// 	"avatar": "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
+			// 	"sign": "customer",
+			// 	"status": "1 ",
+			// 	"delFlg": false,
+			// 	"createTime": 1558591578000,
+			// 	"updateTime": 1558591578000,
+      //   "operator": null,
+      //   "key": '1'
+			// }, {
+			// 	"id": 38,
+			// 	"userName": "YY",
+			// 	"avatar": "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
+			// 	"sign": "勤勤奋奋",
+			// 	"status": "1 ",
+			// 	"delFlg": false,
+			// 	"createTime": 1558590030000,
+			// 	"updateTime": 1558590030000,
+      //   "operator": null,
+      //   "key": '2'
+        
+			// }],
+      editInfo:{
+        item: '',
+        index: ''
+      }
     };
     this.addUserinfo = this.addUserinfo.bind(this)
     this.searchBtn = this.searchBtn.bind(this)
-    this.fetchDelData = this.fetchDelData.bind(this)
+    this.fetchUserInfo = this.fetchUserInfo.bind(this)
+    this.editDataSafe = this.editDataSafe.bind(this)
   }
 
-  handleDelete = key => {
-    const dataSource = [...this.state.data];
-    console.log(key)
-    this.fetchDelData(dataSource, dataSource[key].id)
-    
+  handleDelete(key, id) {
+    console.log(key, id)
+    fetch(`/user/delete/${id}`)
+    .then(res => res.json())
+    .then(data => {
+      console.log(data);
+      if(data.code === 200){
+        message.success(data.msg)
+        this.fetchUserInfo()
+      }
+    })
   };
 
-  fetchDelData(dataSource, id) {
-    console.log(id)
-    fetch(`/user/delete/${id}`)
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        if(data.code === 200){
-          message.success(data.msg)
-          this.setState({ 
-            dataSource: dataSource.filter(item => item.id !== id ) 
-          });
-        }
-      })
-      console.log(this.state.data)
-  }
   //控制新增数据modal框隐藏和显示
   showModal = () => {
-    this.setState({ visible: true });
+    this.setState({ visible: true, uploadBtn: 1});
   };
 
   //控制编辑数据modal框隐藏和显示
-  showEditModal = (i) => {
-    console.log(i)
-    this.setState({ editVisible: true });
+  showEditModal = (item, index) => {
+    console.log(item)
+    console.log(index)
+    
+    this.setState({ 
+      editVisible: true,
+      editInfo:{
+        item: item,
+        index: index
+      }
+     });
+
   };
 
   handleCancel =() => {
@@ -117,20 +153,17 @@ class DataSafeguard extends React.Component {
   handleCreate =() => {
     this.setState({ visible: false });
   }
-  addUserinfo(e){
-    console.log(e)
-    // console.log(this.state.data)
-    // e.key = this.state.data.length+1
-    let newData = this.state.data.concat([e])
-    console.log(newData)
-    // this.setState({
-    //   // data: newData
-    // }, ()=> {
-    //   console.log(newData)
-    // })
+  addUserinfo(ele){
+    this.fetchUserInfo()
   }
+
+  // shouldComponentUpdate(old){
+  //   console.log(old)
+  //   return true
+  // }
   editDataSafe(e){
     console.log(e)
+    this.fetchUserInfo()
   }
 
   edithandleCancel =() => {
@@ -164,7 +197,6 @@ class DataSafeguard extends React.Component {
     .catch( res => {
       console.log(res)
     })
-    
   }
 
   fetchUserInfo(){
@@ -175,40 +207,25 @@ class DataSafeguard extends React.Component {
         'Content-Type':'application/json;'
       },
       body: JSON.stringify(temp),
-
     })
     .then( res => res.json())
     .then( res => {
-      // console.log(res)
+      console.log(res)
       if(res.code === 200){
-        res.data.data.map((e, i) => {
+        res.data.map((e, i) => {
           return (
             e.key = `${i++}`
           )
         })
         this.setState ({
-          data: res.data.data
+          data: res.data
         })
       }
     })
     .catch( res => {
       console.log(res)
     })
-    // fetch('/user/search')
-    // .then( res => res.json() )
-    // .then( res => {
-    //   console.log(res)
-    //   if(res.code === 200){
-    //     res.data.data.map((e, i) => {
-    //       return (
-    //         e.key = `${i++}`
-    //       )
-    //     })
-    //     this.setState ({
-    //       data: res.data.data
-    //     })
-    //   }
-    // })
+  
   }
 
   componentDidMount(){
@@ -227,10 +244,10 @@ class DataSafeguard extends React.Component {
             添加
           </Button>
           <AddUserinfo onUpdata={this.addUserinfo} visible={this.state.visible} cancelModal={this.handleCancel}></AddUserinfo>
-          <EditDataconfig onUpdata={this.editDataSafe} visible={this.state.editVisible} cancelModal={this.edithandleCancel}></EditDataconfig>
+          <EditDataconfig showEditModal={this.state.editInfo} onUpdataEdit={this.editDataSafe} visible={this.state.editVisible} cancelModal={this.edithandleCancel}></EditDataconfig>
         </div>
         <div>
-          <Table pageName={this.state.pageName} columns={this.state.columns} dataSource={this.state.data} scroll={{ x: 1500, y: 300  }} />
+          <Table pagination={{ pageSize: 10 }} pageName={this.state.pageName} columns={this.state.columns} dataSource={this.state.data} scroll={{ x: 1500, y: 300  }} />
         </div>
       </div>
       
