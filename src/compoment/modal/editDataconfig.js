@@ -1,24 +1,37 @@
 import React from 'react';
 import 'antd/dist/antd.css';
 import { Modal, Form, Input, message } from 'antd';
-import { Row, Col, Button, Upload, Icon, Card, Select} from 'antd';
+import { Row, Col, Button, Upload, Icon, Select} from 'antd';
 const { Option } = Select;
 const formItemLayout = {
-  labelCol: { span: 4 },
-  wrapperCol: { span: 16 },
+  labelCol: { span: 6 },
+  wrapperCol: { span: 14 },
 };
 
 const ModifySafeForm = Form.create({ name: 'form_in_modal' })(
   class extends React.Component {
+    // static defaultProps = {
+    //   likedText: '取消',
+    // } 
     constructor(props){
       super(props)
       this.state = {
         selectDepart: [],
         formItem: '',
         formIndex: '',
-        fileList: [],
-        uploadPath: ''
+        baseurl: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+        fileList: [{
+          uid:'-1',
+          name:'头像.png',
+          key: '0',
+          status: 'done',
+          url: ''
+        }],
+        uploadPath: '',
+        imgList: [],
+
       }
+      // this.customRequest = this.customRequest.bind(this)
     }
 
     fetchDepartment(){
@@ -36,33 +49,83 @@ const ModifySafeForm = Form.create({ name: 'form_in_modal' })(
       })
     }
 
-    normFile = e => {
-      console.log('Upload event:', e);
-      // let fileArr = []
-      // fileArr.push(e)
-      if(e.fileList[0].status === "done"){
-        let fileRes = e.fileList[0].response
-        // console.log(fileRes)
-        if(fileRes.code === 200){
-          message.success('头像上传成功～')
-          this.setState({
-            file: fileRes.data,
-          })
-          this.props.onFile(fileRes)
-          // console.log(fileRes)
-        }
-      }
-      return e && e.fileList;
-    };
+    // 拦截文件上传
+    // beforeUpload=(file, fileList)=>{
+    //   console.log(file)
+    //   console.log(fileList)
+    //   this.setState({
+    //     fileList:[file]
+    //   })
+    //   // return false;
+    // }
 
-  updateChange = ({ fileList }) => {
-    // console.log(fileList)
-    this.setState({ fileList })
-  };
+    // updateChange = ( info ) => {
+    //   let fileList = [...info.fileList];
+    //   console.log(info)
+    //   fileList = fileList.slice(-1);
+    //   fileList = fileList.map(file => {
+    //     console.log(file)
+    //     if (file.response) {
+    //       console.log(file)
+    //       file.url = file.response.data;
+    //       if (file.response.code===200) {
+    //         message.success(file.response.msg)
+    //         this.setState({
+    //           file: file.response.data,
+    //         })
+    //         this.props.onFile(file.response.data)
+    //       }
+    //     }
+        
+    //     return file;
+    //   });
+    //   console.log(fileList)
+    //   this.setState({ fileList });
+    // };
+
+    customRequest = (file) => {
+      console.log(file)
+      if(this.state.fileList[0].uid === '1'){
+        message.warning('头像已上传，请不要重复上传～');
+        return false
+      }
+      const formData = new FormData();
+      formData.append('file', file.file);
+      fetch('/user/import', {
+          method: 'POST',
+          body: formData
+      })
+      .then( res => res.json())
+      .then(res => {
+        console.log(res)
+        if(res.code === 200){
+          this.setState({
+            fileList: [{
+              uid:'1',
+              name:'新头像.png',
+              key: '1',
+              status: 'done',
+              url: res.data
+            }]
+          })
+          message.success(res.msg)
+          this.props.onFile(res.data)
+
+        }else {
+          message.warning(res.msg);
+        }
+      })
+      .catch(res => {
+        console.log(res)
+      })
+    }
+
+    // removeFile = (file) => {
+    //   console.log(file)
+    // }
 
     componentDidMount(){
       this.fetchDepartment()
-    
     }
 
     componentWillReceiveProps(o){
@@ -70,15 +133,39 @@ const ModifySafeForm = Form.create({ name: 'form_in_modal' })(
       if(o.showEditModal){
         this.setState({
           formItem: o.showEditModal.item,
-          formIndex: o.showEditModal.index
+          formIndex: o.showEditModal.index,
         })
+        if(this.state.fileList.uid === '-1'){
+          this.setState({
+            fileList:[{
+              uid:'-1',
+              name:'头像.png',
+              key: '0',
+              status: 'done',
+              url: o.showEditModal.item.avatar
+            }]
+          })
+        }
+
       }
     }
-    
+   
 
     render() {
       const { visible, onCancel, onCreate, form, showEditModal, showUpload} = this.props;
       const { getFieldDecorator } = form;
+      console.log(this.state)
+      // beforeUpload={this.beforeUpload} onChange={this.updateChange} fileList={this.state.fileList}  listType="picture"
+      const props = {
+        // action: '/user/import',
+        // beforeUpload: this.beforeUpload,
+        // onChange: this.updateChange,
+        fileList: this.state.fileList,
+        listType:"picture",
+        customRequest: this.customRequest,
+        // onRemove: this.removeFile
+      }
+      
       return (
         <Modal
           visible={visible}
@@ -134,53 +221,23 @@ const ModifySafeForm = Form.create({ name: 'form_in_modal' })(
                     )}
                   </Form.Item>
                 </Col>
+                
                 <Col span={18} offset={4}>
-                  <Form.Item {...formItemLayout} label="头像">
-                    {getFieldDecorator('file', {
-                      rules: [{required:true, message: '请上传头像' }],
-                      valuePropName: 'fileList',
-                      getValueFromEvent: this.normFile,
-                      initialValue: this.state.fileList,
-                      // initialValue: [{uid: '-1',name: '头像.png',url: showEditModal.item.avatar}],
-                    })(
-                      <Upload name="file"  beforeUpload={this.beforeUpload}  onChange={this.updateChange}  action="/user/import" listType="picture">
-                        {this.state.fileList.length > 0 && showUpload!=='1'? (null):(
-                          <Button>
-                            <Icon type="upload" />更换图片
-                          </Button>
-                          
-                        )}
-                      </Upload>,
-                    )}
+                  <Form.Item labelCol={{span:6}} wrapperCol={{span:14}} label='头像'>
+                      {getFieldDecorator('file')(
+                          <Upload {...props} >
+                              <Button><Icon type='upload' />上传文件</Button>
+                          </Upload>
+                      )}
                   </Form.Item>
                 </Col>
+                
 
-                {this.state.fileList.length > 0 && showUpload!=='1'? (null):(
-                    //    <Card
-                    //    bordered={false}
-                    //    hoverable
-                    //    style={{ width: 60 }}
-                    //    cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
-                    //  >
-                    //  </Card> 
-                  <div className="jia_filepic">
-                    <div className="filepic clearfix">
-                      <div className="fl left_img">
-                        <div className="img_box">
-                          <img alt="example" src={showEditModal.item.avatar} />
-                        </div>
-                      </div>
-                      <span className="fr right_txt">
-                        touxiang.png
-                      </span>
-
-                    </div> 
-                  </div> 
-                          
-                )}
-                         
+            
               </Row>
           </Form>
+          
+
         </Modal>
       );
     }
@@ -227,17 +284,15 @@ class editPage extends React.Component {
         return;
       }
       console.log(values);
-      values['key'] = 9
       event = values
-      form.resetFields();
-      this.props.cancelModal()
-      // console.log(this.state.formItem)
+
+      console.log(this.state)
       let userInfo = {
         userName: values.showEditModal.userName,
         groupCode: values.code,
         sign: values.sign,
         status: values.status==="是"?"1":"0",
-        avatar: this.state.file.data,
+        avatar: this.state.file,
         id: this.state.formItem.id
       }
       fetch('/user/update',{
@@ -253,13 +308,17 @@ class editPage extends React.Component {
         if(res.code === 200){
           message.success(res.msg)
           this.props.onUpdataEdit(event);
+          
         }else {
           message.warning(res.msg);
         }
+        form.resetFields();
       })
       .catch( res => {
         console.log(res)
       })
+      this.props.cancelModal()
+
     // }
 
     });

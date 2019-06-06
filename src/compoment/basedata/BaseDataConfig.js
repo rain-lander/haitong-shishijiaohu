@@ -72,32 +72,32 @@ class DataSafeguard extends React.Component {
                       </div>,
       },
     ],
-    data: [],
+    // data: [],
 
-      // data: [{
-			// 	"id": 41,
-			// 	"userName": "EE",
-			// 	"avatar": "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
-			// 	"sign": "customer",
-			// 	"status": "1 ",
-			// 	"delFlg": false,
-			// 	"createTime": 1558591578000,
-			// 	"updateTime": 1558591578000,
-      //   "operator": null,
-      //   "key": '1'
-			// }, {
-			// 	"id": 38,
-			// 	"userName": "YY",
-			// 	"avatar": "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
-			// 	"sign": "勤勤奋奋",
-			// 	"status": "1 ",
-			// 	"delFlg": false,
-			// 	"createTime": 1558590030000,
-			// 	"updateTime": 1558590030000,
-      //   "operator": null,
-      //   "key": '2'
+      data: [{
+				"id": 41,
+				"userName": "EE",
+				"avatar": "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
+				"sign": "customer",
+				"status": "1 ",
+				"delFlg": false,
+				"createTime": 1558591578000,
+				"updateTime": 1558591578000,
+        "operator": null,
+        "key": '1'
+			}, {
+				"id": 38,
+				"userName": "YY",
+				"avatar": "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
+				"sign": "勤勤奋奋",
+				"status": "1 ",
+				"delFlg": false,
+				"createTime": 1558590030000,
+				"updateTime": 1558590030000,
+        "operator": null,
+        "key": '2'
         
-			// }],
+			}],
       editInfo:{
         item: '',
         index: ''
