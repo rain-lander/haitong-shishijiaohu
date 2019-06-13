@@ -154,7 +154,7 @@ const ModifySafeForm = Form.create({ name: 'form_in_modal' })(
     render() {
       const { visible, onCancel, onCreate, form, showEditModal, showUpload} = this.props;
       const { getFieldDecorator } = form;
-      console.log(this.state)
+      // console.log(this.state)
       // beforeUpload={this.beforeUpload} onChange={this.updateChange} fileList={this.state.fileList}  listType="picture"
       const props = {
         // action: '/user/import',
@@ -256,7 +256,6 @@ class editPage extends React.Component {
         formIndex: '',
         receivedValues: {}
       }
-
       this.onFile = this.onFile.bind(this)
 
     }

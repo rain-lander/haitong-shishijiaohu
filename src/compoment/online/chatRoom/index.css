@@ -21,8 +21,15 @@
 
 .msg-show .user_name {
   display: inline-block;
-  margin-top: 3px;
+  margin-top: 8px;
   color: #6f5499;
+  margin-bottom: 5px;
+
+}
+.msg-show .content {
+  background-color: #fff;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 .chat_box {
@@ -41,4 +48,7 @@
 .message_flex {
   line-height: 45px;
   /* justify-content: space-between; */
+}
+.message_load {
+  width: 200px;
 }

@@ -41,9 +41,9 @@ export default class App extends Component {
                 <Menu.Item key="1"><Link to="/">用户信息设置</Link></Menu.Item>
                 <Menu.Item key="2"><Link to="/BaseDataSafe">配置信息维护</Link></Menu.Item>
               </SubMenu>
-              <SubMenu key="sub2" title={<span><Icon type="laptop" />在线客服</span>}>
-                <Menu.Item key="3"><Link to="/online/OnlineCustomers">小明</Link></Menu.Item>
-              </SubMenu>
+              {/* <SubMenu key="sub2" title={<span><Icon type="laptop" />在线客服</span>}> */}
+                <Menu.Item key="3"><Link to="/online/OnlineCustomers"><span><Icon type="laptop" />在线客服</span></Link></Menu.Item>
+              {/* </SubMenu> */}
               <SubMenu key="sub3" title={<span><Icon type="notification" />聊天信息</span>}>
                 <Menu.Item key="4"><Link to="/chatmessage/ChatMessage">信息详情</Link></Menu.Item>
               </SubMenu>

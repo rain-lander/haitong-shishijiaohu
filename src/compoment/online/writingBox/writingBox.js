@@ -13,7 +13,7 @@ class TypeIn extends React.Component {
     super(props);
     this.state = {
       text: "",
-      emojiShow: false,
+      // emojiShow: false,
       
     };
     this.messageSend = this.messageSend.bind(this);
@@ -26,8 +26,7 @@ class TypeIn extends React.Component {
     this.emojiEdit = this.emojiEdit.bind(this)
     this.hideEmoji = this.hideEmoji.bind(this)
 
-    this.changeUploadShow = this.changeUploadShow.bind(this)
-
+    this.uploadFile = this.uploadFile.bind(this)
   }
   messageType(e) {
     this.setState({
@@ -39,11 +38,9 @@ class TypeIn extends React.Component {
       text: ''
     });
     let value = this.refs.myInput.value;
-    // console.log(value)
     this.props.messageReceive({value})
     this.setState({
       emojiShow: false
-
     })
   }
   handleDown(e) {
@@ -74,28 +71,24 @@ class TypeIn extends React.Component {
   }
 
   changeEmojiShow(){
-    this.setState({
-      emojiShow: !this.state.emojiShow
-    })
-
+    this.props.emojiShow({emojiShow: true})
   }
   emojiEdit(o, e){
+    // console.log(o,'----', e)
     let emoji_icon = jsemoji.replace_colons(`:${e.name}:`);
     this.setState({
       text: this.state.text+emoji_icon
     })
+    this.props.emojiShow({emojiShow: false})
+
   }
 
   hideEmoji(){
-    this.setState({
-      emojiShow: false
-    })
+    this.props.emojiShow({emojiShow: false})
   }
 
-  changeUploadShow(){
-    this.setState({
-      uploadShow: !this.state.emojiShow
-    })
+  uploadFile(e){
+    this.props.messageFile(e)
   }
   
   render() {
@@ -105,14 +98,15 @@ class TypeIn extends React.Component {
           <span className="emoji_icon" onClick={this.changeEmojiShow}>
             <Icon type="smile" theme="twoTone" />
           </span>
-          <span className="file_icon" onClick={this.changeUploadShow}>
+          <span className="file_icon">
             <Icon type="folder" theme="twoTone" />
+            <input type="file" name="file" className="upload_input" onChange={this.uploadFile} ref={this.inputRef}/>
           </span>
         </div>
         {/* 是否展示emoji盒子 */}
         {
-          !this.state.emojiShow ? (null) : (
-              <EmojiPicker onEmojiClick={this.emojiEdit}/>
+          !this.props.emojiHide ? (null) : (
+              <EmojiPicker preload emojiResolution={64} onEmojiClick={this.emojiEdit}/>
           )
         }
         

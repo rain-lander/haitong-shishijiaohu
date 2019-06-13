@@ -8,9 +8,12 @@ class MsgShow extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      // uploadShow: true,
-
     }
+    this.changeEmojiShow = this.changeEmojiShow.bind(this)
+  }
+
+  changeEmojiShow(){
+    this.props.emojiHide({emojiHide: false})
   }
 
   componentDidMount(){
@@ -25,16 +28,17 @@ class MsgShow extends React.Component {
     var {messageShow} = this.props;
     // console.log(messageShow)
     return (
-      <div ref='myDiv' className='msg-show'>
-        <h5>群聊</h5>
+      <div ref='myDiv' className='msg-show' onClick={this.changeEmojiShow}>
+        {/* <h5></h5> */}
         <div ref='chatScrolldiv' className='chat_box'>
           <ul ref='chatListdiv'>
             {messageShow.map((item, index) => {
                 if (item.msg !== ''&&item.type==='1'||item.type===undefined) {
                   return (
                     <li key={index}>
-                          <span className="user_name">{item.name}:</span>
-                          <div dangerouslySetInnerHTML={{
+                        <span className="time_stanp">{item.createTime}</span>
+                        <span className="user_name">{item.sender}:</span>
+                        <div className="content" dangerouslySetInnerHTML={{
                       __html: item.content
                         }}>
                           </div>
@@ -45,12 +49,12 @@ class MsgShow extends React.Component {
                 if(item.msg !== ''&&item.type==='2'){
                   return (
                     <li key={index}>
-                          <span className="user_name">{item.name}:</span>
+                          <span className="user_name">{item.sender}:</span>
                           <div className="message_load">
-                            <a href={item.url} className="message_img">
+                            <a href={item.url} target="_blank" className="message_img">
                             <Card
                               hoverable
-                              style={{ width: 180 }}
+                              // style={{ width: 180 }}
                               cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
                             >
                               <Meta title={item.img_name} />
@@ -64,7 +68,7 @@ class MsgShow extends React.Component {
                 if(item.msg !== ''&&item.type==='3'){
                   return (
                     <li key={index}>
-                          <span>{item.name}:</span>
+                          <span>{item.sender}:</span>
                           <div className="message_upload">
                             <div className="message_file">
                               {/* <div className="message_flex"> */}

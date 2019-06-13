@@ -6,7 +6,7 @@
   .text-box {
     position: relative;
     display: flex;
-    flex: 0 0 130px;
+    flex: 0 0 157px;
   }
   .text-box textarea {
     padding: 10px;
@@ -48,4 +48,15 @@
     bottom: 88px;
     left: 0;
   }
-  
+
+  .file_icon {
+    position: relative;
+  }
+  .upload_input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    width: 30px;
+    opacity: 0;
+  }

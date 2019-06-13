@@ -1,18 +1,23 @@
 .nav{
   width: 100%;
-  -ms-flex: 0 0 90px;
-  flex: 0 0 90px;
-  background-color: #3d586c;
-  color: white;
-  padding: 25px;
+  /* -ms-flex: 0 0 90px;
+  flex: 0 0 90px; */
+  background-color: #cacaca;
+  color: #222;
+  padding: 15px;
   box-sizing: border-box;
   font-size: 20px;
-  display: -ms-flexbox;
+  /* display: -ms-flexbox; */
   display: flex;
-  -ms-flex-align: center;
-  align-items: center;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
+  flex-direction: row;
+  /* -ms-flex-align: center;
+  align-items: center; */
+  /* -ms-flex-pack: justify;
+  justify-content: space-between; */
+}
+
+.my_icon {
+  border-right: 1px solid #eee;
 }
 
 .nav button {
@@ -27,6 +32,7 @@
 .message-wrap {
   display: flex;
   flex: 1;
+  height: 100%;
 }
 .typein-wrap {
   display: flex;
@@ -42,13 +48,24 @@
 .chat-wrap {
   display: flex;
   flex: 1;
+  height: 95%;
 }
 
-.upload_input {
+/* .upload_input {
   z-index: 2;
   width: 30px;
   position: absolute;
   left: 40px;
-  bottom: 130px;
+  top: 435px;
   opacity: 0;
+} */
+
+.friends_list {
+  border: 1px solid #eee;
+  background-color: #ccc;
+  /* width: 29%; */
+}
+.onlinechat_box {
+  /* width: 70%; */
+  height: 100%;
 }

@@ -2,7 +2,7 @@
   "name": "my-new-app",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://101.92.196.154:8099",
+  "proxy": "http://101.92.192.99:8099",
   "dependencies": {
     "@babel/core": "7.2.2",
     "@svgr/webpack": "4.1.0",

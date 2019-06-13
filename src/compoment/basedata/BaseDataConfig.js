@@ -155,6 +155,7 @@ class DataSafeguard extends React.Component {
   }
   addUserinfo(ele){
     this.fetchUserInfo()
+
   }
 
   // shouldComponentUpdate(old){
@@ -230,6 +231,7 @@ class DataSafeguard extends React.Component {
 
   componentDidMount(){
     this.fetchUserInfo()
+
   }
 
   render() {

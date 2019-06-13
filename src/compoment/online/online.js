@@ -6,7 +6,7 @@ import WritingBox from './writingBox/writingBox'
 // const socket = io('ws://101.92.200.103:8099');
 import {  Avatar } from 'antd';
 
-var ws = null;
+var socket = null;
 require('./index.css');
 
 class Nav extends React.Component {
@@ -15,7 +15,48 @@ class Nav extends React.Component {
 
     this.state = {
       nameList: [],
-      contentList: [],
+      contentList: [
+        // { 
+        //   type: '1', 
+        //   name: '小明', 
+        //   content: '沙发！！！'
+        // },
+        // { 
+        //   type: '1', 
+        //   name: '井柏然', 
+        //   content: '小明，居然是你' 
+        // },
+        // //图片
+        // { 
+        //   type: '2',
+        //   name: '范冰冰',
+        //   img_name: "1.jpg",
+        //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+
+        //  },
+        //  //文件
+        //  { 
+        //   type: '3',
+        //   name: '范冰冰',
+        //   file_name: "888.doc",
+        //   url: './index.css',
+        //  },
+        //  //图片
+        // { 
+        //   type: '2',
+        //   name: '范冰冰',
+        //   img_name: "1.jpg",
+        //   url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+
+        //  },
+        //  //文件
+        //  { 
+        //   type: '3',
+        //   name: '范冰冰',
+        //   file_name: "888.doc",
+        //   url: './index.css',
+        //  },
+      ],
       mainUserId: 0,
       mainUserName: "",
       mainUserType: 1,
@@ -28,9 +69,12 @@ class Nav extends React.Component {
     this.changeUserId = this.changeUserId.bind(this)
 
     this.initWebSocket = this.initWebSocket.bind(this)
+    this.websocketonopen = this.websocketonopen.bind(this)
+    this.websocketonerror = this.websocketonerror.bind(this)
+    this.websocketonmessage = this.websocketonmessage.bind(this)
+    this.websocketclose = this.websocketclose.bind(this)
 
     this.getfriendsList = this.getfriendsList.bind(this)
-    this.getContentList = this.getContentList.bind(this)
     this.messageFile = this.messageFile.bind(this)
     this.emojiHide = this.emojiHide.bind(this)
     this.emojiShow = this.emojiShow.bind(this)
@@ -51,20 +95,19 @@ class Nav extends React.Component {
       roomId: 'G001'
     }]
     console.log(sendInfo)
-    ws.send(JSON.stringify(sendInfo))
+    // if(socket.readyState===1){
+      socket.send(JSON.stringify(sendInfo))
+    // }
   }
 
   changeUserId(id, name, type){
-    console.log(id, name, type)
+    console.log(id, name)
     this.setState({
       mainUserId: id,
       mainUserName: name,
       mainUserType: type
-    },()=> {
-      this.getContentList()
-
     })
-    // this.initWebSocket(id,'G001')
+    this.initWebSocket(id,'G001')
 
   }
 
@@ -86,25 +129,61 @@ class Nav extends React.Component {
       console.log(data)
     })
   }
+  //初始化socket配置
+  initWebSocket(userId, roomId) {
+    // /websocket/{ro_user}
+    // ro_user: userId|roomId 
+    // wss://echo.websocket.org/
+    // const wsuri = `wss://echo.websocket.org`; //ws地址
 
-  // heartCheck = {
-  //   timeout: 3000,
-  //   timeoutObj: null,
-  //   reset: function(){
-  //       clearTimeout(this.timeoutObj);
-  //       this.start();
-  //       console.log('reset')
-  //   },
-  //   start: function(){
-  //       this.timeoutObj = setTimeout(()=>{
-  //         socket.send('HeartBeat')
-  //         console.log('start')
-  //       }, this.timeout)
-  //   },
-  // }
+    const wsuri = `ws://101.92.192.99:8099/websocket/${userId}|${roomId}`; //ws地址
+    socket = new WebSocket(wsuri);
+    socket.onopen = this.websocketonopen();
+    socket.onerror = this.websocketonerror();
+    socket.onmessage = this.websocketonmessage();
+    socket.onclose = this.websocketclose();
+    
+  }
+  websocketonopen() {
+    // socket.send("Hello WebSockets!")
+    console.log("WebSocket连接成功");
+    this.heartCheck.start();
+    // console.log(this.heartCheck)
+  }
+  websocketonmessage(e) {
+    // let msgJson = JSON.parse(e.data)
+    console.log(e)
+  }
+  websocketonerror(e) {
+    console.log(e)
+    //错误
+    console.log("WebSocket连接发生错误");
+  }
+  websocketclose() {
+    console.log("连接已关闭")
+    this.heartCheck.reset()
+  }
+
+  heartCheck = {
+    timeout: 3000,
+    timeoutObj: null,
+    reset: function(){
+        clearTimeout(this.timeoutObj);
+        this.start();
+        console.log('reset')
+    },
+    start: function(){
+        this.timeoutObj = setTimeout(()=>{
+          socket.send('HeartBeat')
+          console.log('start')
+        }, this.timeout)
+    },
+  }
 
   //获取用户好友列表
   getfriendsList(){
+    // console.log(this.heartCheck)
+    // this.heartCheck.reset()
     fetch(`/chat/${this.state.userid}/init.json`)
     .then(res => res.json())
     .then(res => {
@@ -122,34 +201,6 @@ class Nav extends React.Component {
       console.log(res)
     })
   }
-
-  getContentList(){
-    let friendInfo = {
-      sender: this.state.nameList.mine.id,
-      receiver: this.state.mainUserId,
-      chatType: this.state.mainUserType
-    }
-    console.log(friendInfo)
-    
-    fetch('/content/getContentList',{
-      method: 'POST',
-      headers:{
-        'Content-Type':'application/json'
-      },
-      body: JSON.stringify(friendInfo)
-    })
-    .then( res => res.json())
-    .then( res => {
-      console.log(res)
-      if(res.code === 200){
-        this.setState({
-          contentList: res.data
-        })
-      }
-    })
-    
-  }
-  
   emojiHide(e){
     this.setState({
       emojiHide: false,
@@ -160,32 +211,11 @@ class Nav extends React.Component {
       emojiHide: e.emojiShow
     })
   }
-
-  initWebSocket(userId, roomId){
-    // ws = new WebSocket("wss://echo.websocket.org");
-    ws = new WebSocket(`ws://101.92.192.99:8099/websocket/${userId}|${roomId}`);
-
-    ws.onopen = function(evt) { 
-      console.log("Connection open ..."); 
-      ws.send("Hello!");
-    };
-
-    ws.onmessage = function(evt) {
-      console.log( "收到了: " + evt.data);
-      // ws.close();
-    };
-    ws.onerror = function(event) {
-      console.log(event)
-    };
-    ws.onclose = function(evt) {
-      // console.log(evt)
-      console.log("连接关闭");
-    };
+  componentWillUpdate(){
+    
   }
-
   componentDidMount() {
     this.getfriendsList()
-    // this.initWebSocket()
   }
   render(){
     return (
