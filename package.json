@@ -47,7 +47,7 @@
     "qs": "^6.7.0",
     "react": "^16.8.6",
     "react-app-polyfill": "^0.2.2",
-    "react-dev-utils": "^8.0.0",
+    "react-dev-utils": "^11.0.4",
     "react-dom": "^16.8.6",
     "react-emoji": "^0.5.0",
     "react-emoji-picker": "^1.0.13",
